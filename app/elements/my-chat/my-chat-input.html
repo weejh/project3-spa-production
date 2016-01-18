@@ -1,0 +1,57 @@
+/*jshint esversion: 6 */
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+
+<dom-module id="my-chat-input">
+  <template>
+  <style>
+
+  paper-input {
+        padding: 10px;
+    }
+  </style>
+
+    <div id="container" horizontal layout center>
+      <form is="iron-form" action="">
+        <paper-input id="m" autocomplete="off" on-keypress="keyPressed" placeholder='type your message ...'></paper-input>
+        <paper-button raised class="custom indigo" id=“click-me” on-click="onClick"><iron-icon icon="send"></iron-icon>send</paper-button>
+      </form>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+      is: 'my-chat-input',
+
+      sendText: function() {
+        this.fire('message',
+          {
+            message: this.$.m.value
+          });
+        this.$.m.value = '';
+      },
+
+      onClick: function(event) {
+        this.sendText();
+        event.preventDefault();
+      },
+
+      keyTyping: function() {
+        this.fire('typing', {typed: true});
+      },
+
+      keyPressed: function(event) {
+        // console.log('keyPressed =>', event);
+        this.keyTyping();
+        if (event.code === 'Enter') {
+          this.sendText();
+          event.preventDefault();
+        }
+      },
+    });
+
+  </script>
+</dom-module>

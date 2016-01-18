@@ -1,0 +1,195 @@
+/* globals 'io': true */
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="my-chat-input.html">
+<!-- <link rel="import" href="my-chat-view.html"> -->
+
+<script src="https://cdn.socket.io/socket.io-1.4.3.js"></script>
+
+<dom-module id="my-chat">
+  <template>
+    <!-- /*<style include="shared-styles"></style>*/ -->
+    <style>
+      :host {
+        display: block;
+      }
+
+      #messageList {
+        height: 50px;
+        width: auto;
+        border-radius: 10px 10px 10px 10px;
+        border: 0px ridge #f0f0f0;
+      }
+
+      #messageList:nth-child(odd) {
+        background: #eee;
+      }
+
+      #senderNtime {
+        color: red;
+        font-size: 10px;
+      }
+
+      #userId {
+        color: blue;
+        font-size: 10px;
+        padding-top: 20px;
+      }
+      #container {
+        width: auto;
+         height: 50vh;
+      }
+
+    </style>
+
+    <div id="container" layout vertical>
+      <p class="paper-font-subhead">{{daTe}}</p>
+
+      <div id="messagecontainer">
+            <template is="dom-repeat" items="{{listMessages}}">
+              <paper-material id='messageList' elevation="1">
+                  <div id='messAge'>
+                    <span>{{item.messDage}}</span>
+                  </div>
+                  <div id='senderNtime'>
+                    sender: <span>{{item.userDname}}</span> |
+                    time: <span>{{item.timeDstamp}}</span>
+                  </div>
+            </paper-material>
+          </template>
+        </div>
+
+      <div id='boTtom'>
+        <my-chat-input id="mychatinput"></my-chat-input>
+        <div id='userId'>
+          status: <b>{{staTus}}</b> | user: <b>{{userName}}</b>
+        </div>
+      </div>
+  </div>
+
+
+    </template>
+
+  <script>
+      Polymer({
+        is: 'my-chat',
+
+        properties: {
+          listMessages: {
+            type: Array,
+            notify: true,
+            value: function() { return []; }
+          }
+        },
+
+        created: function() {
+          console.log('my chat created function');
+          var socket = io.connect('https://ga-webchat.herokuapp.com/', {
+            'query': 'token=' + window.localStorage.getItem('userToken')
+          });
+
+          var self = this;
+          socket.on('chat log', function(messages) {
+            messages.forEach(function(message, index) {
+              // console.log(message);
+              var messageDisplay = '';
+              if ((messages.length - index) < 6) {
+                // console.log(message.message.slice(3, (message.message.length-4)))
+                const messageLength = 100;
+
+                if (message.message.length < messageLength) {
+                  messageDisplay = message.message.slice(3, (message.message.length - 4));
+                } else {
+                  messageDisplay = message.message.slice(3, messageLength).concat('...');
+                }
+
+                self.push('listMessages',
+                  {
+                    messDage: messageDisplay,
+                    timeDstamp: new Date(message.timestamp),
+                    userDname: message.username
+                  });
+              }
+            });
+          });
+        },
+
+        attached: function() {
+          console.log('my chat attached function');
+        },
+
+        detached: function() {
+          console.log('my chat detached function');
+        },
+
+        ready: function() {
+          var self = this;
+
+          console.log('my chat ready function');
+          function upDate() {
+            self.daTe = new Date();
+          }
+          upDate();
+          setInterval(upDate, 100);
+
+          if (window.localStorage.getItem('userToken')) {
+            // console.log('login')
+            this.staTus = 'working ... ';
+            this.userName = JSON.parse(window.localStorage.getItem('profile')).nickname;
+          } else {
+            // console.log('not login')
+            this.staTus = 'kopi time ... ';
+            this.userName = '@ kopitiam ...';
+          }
+
+          var socket = io.connect('https://ga-webchat.herokuapp.com/', {
+            'query': 'token=' + window.localStorage.getItem('userToken')
+          });
+
+          // var socket = io.connect('http://localhost:3000/', {
+          //   'query': 'token=' + window.localStorage.getItem('userToken')
+          // });
+
+          function sendMessage(event) {
+            var timestamp = new Date();
+            var message = {
+              username: '',
+              message: event.detail.message,
+              timestamp: timestamp.toISOString()
+            };
+
+            if (window.localStorage.getItem('profile')) {
+              message.username = JSON.parse(window.localStorage.getItem('profile')).nickname;
+            }
+  
+            socket.emit('chat message', message);
+          }
+  
+          this.$.mychatinput.addEventListener('message', sendMessage);
+  
+          socket.on('chat message', function(message) {
+  
+            const messageListparent = self.$$('#messagecontainer');
+            Polymer.dom(messageListparent).removeChild(Polymer.dom(messageListparent)
+              .firstElementChild);
+            const messageLength = 100;
+            var messageDisplay = '';
+            if (message.message.length < messageLength) {
+              messageDisplay = message.message.slice(3, (message.message.length - 4));
+            } else {
+              messageDisplay = message.message.slice(3, messageLength).concat('...');
+            }
+            console.log(message.message.length);
+            self.push('listMessages',
+              {
+                messDage: messageDisplay,
+                timeDstamp: new Date(message.timestamp),
+                userDname: message.username
+              });
+          });
+        }
+      });
+
+  </script>
+
+</dom-module>

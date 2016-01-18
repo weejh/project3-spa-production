@@ -1,0 +1,141 @@
+/* global Auth0Lock:false */
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<script src="../../auth0.js"></script>
+
+<dom-module id="my-login">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+      /*paper-button:hover {
+        background: lime;
+      }*/
+      paper-button {
+      	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #7892c2), color-stop(1, #476e9e));
+      	background:-moz-linear-gradient(top, #7892c2 5%, #476e9e 100%);
+      	background:-webkit-linear-gradient(top, #7892c2 5%, #476e9e 100%);
+      	background:-o-linear-gradient(top, #7892c2 5%, #476e9e 100%);
+      	background:-ms-linear-gradient(top, #7892c2 5%, #476e9e 100%);
+      	background:linear-gradient(to bottom, #7892c2 5%, #476e9e 100%);
+      	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#7892c2', endColorstr='#476e9e',GradientType=0);
+      	background-color:#7892c2;
+      	-moz-border-radius:10px;
+      	-webkit-border-radius:10px;
+      	border-radius:10px;
+      	display:inline-block;
+      	cursor:pointer;
+      	color:#ffffff;
+      	font-family:Arial;
+      	font-size:15px;
+      	font-weight:bold;
+      	padding:10px 20px;
+      	text-decoration:none;
+      }
+
+      paper-button:hover {
+      	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #476e9e), color-stop(1, #7892c2));
+      	background:-moz-linear-gradient(top, #476e9e 5%, #7892c2 100%);
+      	background:-webkit-linear-gradient(top, #476e9e 5%, #7892c2 100%);
+      	background:-o-linear-gradient(top, #476e9e 5%, #7892c2 100%);
+      	background:-ms-linear-gradient(top, #476e9e 5%, #7892c2 100%);
+      	background:linear-gradient(to bottom, #476e9e 5%, #7892c2 100%);
+      	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#476e9e', endColorstr='#7892c2',GradientType=0);
+      	background-color:#476e9e;
+      }
+      .myButton:active {
+      	position:relative;
+      	top:1px;
+      }
+
+      #userId {
+        color: blue;
+        font-size: 10px;
+        padding-top: 20px;
+      }
+
+    </style>
+
+    <p class="paper-font-subhead">{{daTe}}</p>
+
+      <paper-button raised class="custom indigo" id=“click-me” on-click="logIn">
+        <iron-icon icon="work"></iron-icon> work</paper-button>
+      <paper-button raised class="custom indigo" id=“click-me” on-click="logOff">
+        <iron-icon icon="maps:local-cafe"></iron-icon> kopi</paper-button>
+
+        <div id='userId'>
+          status: <b>{{staTus}}</b> | user: <b>{{userName}}</b>
+        </div>
+
+  </template>
+
+  <script>
+      Polymer({
+        is: 'my-login',
+
+        created: function() {
+          console.log('my login created function');
+        },
+
+        attached: function() {
+          console.log('my login attached function');
+          if (window.localStorage.getItem('userToken')) {
+            // console.log('login')
+            this.staTus = 'working ... ';
+            this.userName = JSON.parse(window.localStorage.getItem('profile')).nickname;
+          } else {
+            // console.log('not login')
+            this.staTus = 'kopi time ... ';
+            this.userName = '@ kopitiam ...';
+          }
+        },
+
+        detached: function() {
+          console.log('my login detached function');
+        },
+
+        ready: function() {
+          var self = this;
+          console.log('my login ready function');
+          function upDate() {
+            self.daTe = new Date();
+          }
+          upDate();
+          setInterval(upDate, 100);
+
+        },
+
+        logIn: function() {
+          console.log('here');
+          // var lock = new Auth0Lock('NGW5BkUSyZSeAoPy0yC8RJMapLG4aXVT', 'weejh.auth0.com');
+
+          var lock = new Auth0Lock(
+              'uCxiKiGA49tLe3f9iXNsBp2XdzvBzImZ',
+              'zellwk.auth0.com'
+            );
+          lock.show(function(err, profile, token) {
+            if (err) {
+              console.error('Something went wrong: ', err);
+            } else {
+              // window.localStorage.removeItem('userToken');
+              // window.localStorage.removeItem('profile');
+              window.localStorage.setItem('userToken', token);
+              window.localStorage.setItem('profile', JSON.stringify(profile));
+              // console.log('login =>', window.localStorage.getItem('userToken'));
+              window.location.reload();
+            }
+          });
+        },
+
+        logOff: function() {
+          console.log('logoff');
+          window.localStorage.removeItem('userToken');
+          window.localStorage.removeItem('profile');
+          window.location.reload();
+        },
+      });
+  </script>
+
+</dom-module>
