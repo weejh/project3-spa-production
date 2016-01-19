@@ -49,6 +49,7 @@
     "merge-stream": "^1.0.0",
     "run-sequence": "^1.0.2",
     "del": "^2.0.2",
+    "web-component-tester": "^3.4.0",
     "bower": "^1.7.2"
   }
 }
