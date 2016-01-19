@@ -65,6 +65,7 @@
     "gulp-jshint": "^1.6.3",
     "gulp-autoprefixer": "^3.1.0",
     "web-component-tester": "^3.4.0",
+    "gulp-vulcanize": "^6.0.0",
     "bower": "^1.7.2"
   }
 }
