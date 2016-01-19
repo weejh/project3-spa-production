@@ -56,6 +56,7 @@
     "gulp-minify-html": "^1.0.2",
     "gulp-html-extract": "^0.0.3",
     "del": "^2.0.2",
+    "gulp-jscs": "^3.0.0",
     "gulp-jshint": "^1.6.3",
     "gulp-autoprefixer": "^3.1.0",
     "web-component-tester": "^3.4.0",
