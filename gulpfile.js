@@ -325,9 +325,10 @@ gulp.task('deploy-gh-pages', function() {
     }), $.ghPages()));
 });
 
-gulp.task('heroku:production', function(){
-    console.log('hello'); // the task does not need to do anything.
+gulp.task('heroku:production', function() {
+  console.log('hello'); // the task does not need to do anything.
 });
+
 // Load tasks for web-component-tester
 // Adds tasks for `gulp test:local` and `gulp test:remote`
 require('web-component-tester').gulp.init(gulp);
